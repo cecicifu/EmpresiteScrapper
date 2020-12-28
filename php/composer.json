@@ -1,0 +1,13 @@
+{
+    "name": "empresite_scrapper",
+    "authors": [
+        {
+            "name": "Ceci Cifu"
+        }
+    ],
+    "require": {
+        "fabpot/goutte": "3.3.0",
+        "guzzlehttp/guzzle": "^6.5",
+        "ext-json": "*"
+    }
+}
