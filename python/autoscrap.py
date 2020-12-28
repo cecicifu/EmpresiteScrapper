@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import requests, signal, threading, sys
+import requests
+import signal
+import threading
+import sys
+import bs4
 from time import sleep
-from bs4 import BeautifulSoup
 
 # GLOBAL VARS
 url = "https://empresite.eleconomista.es/Actividad/"
@@ -19,7 +22,8 @@ phone_element_filter = "span.tel"
 
 s = requests.Session()
 s.headers = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 "
+                  "Safari/537.36",
 }
 # FREE SSL PROXIES https://www.sslproxies.org/
 s.proxies = {
@@ -32,7 +36,7 @@ s.proxies = {
 }
 
 
-class bcolors:
+class Colors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
     OKGREEN = "\033[92m"
@@ -43,17 +47,17 @@ class bcolors:
     UNDERLINE = "\033[4m"
 
 
-if len(sys.argv) is not 2:
-    print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-          "] Usage:" + bcolors.ENDC + " py " + sys.argv[0] + " <search>")
+if len(sys.argv) != 2:
+    print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
+          "] Usage:" + Colors.ENDC + " py " + sys.argv[0] + " <search>")
     sys.exit(0)
 else:
     search = sys.argv[1].upper()
     url = url + search + "/"
 
 
-def signal_handler(key, frame):
-    print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
+def signal_handler():
+    print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
           "] Exiting...\n")
     exit(1)
 
@@ -65,50 +69,50 @@ def execute():
     try:
         pages = get_num_pages()
 
-        print(bcolors.OKGREEN +
-              "\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-              "] Total number of pages:" + bcolors.ENDC, len(pages[1:]))
+        print(Colors.OKGREEN +
+              "\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
+              "] Total number of pages:" + Colors.ENDC, len(pages[1:]))
 
         hrefs = get_hrefs(pages)
 
-        print(bcolors.OKGREEN +
-              "\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-              "] Total of pages:" + bcolors.ENDC, len(hrefs))
+        print(Colors.OKGREEN +
+              "\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
+              "] Total of pages:" + Colors.ENDC, len(hrefs))
 
         data = get_filtered_data(hrefs)
 
-        print("\n" + bcolors.OKGREEN + "\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-              "] DATA:\n" + bcolors.ENDC, data)
+        print("\n" + Colors.OKGREEN + "\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" +
+              Colors.OKGREEN + "] DATA:\n" + Colors.ENDC, data)
 
     except requests.exceptions.Timeout:
-        print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
+        print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
               "] Timeout exception\n")
     except requests.exceptions.TooManyRedirects:
-        print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
+        print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
               "] Too many redirects exception\n")
-    except Exception as e:
-        print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-              "]", str(e), "\n")
+    except Exception as err:
+        print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
+              "]", str(err), "\n")
 
 
 def get_filtered_data(hrefs):
     data = []
     for href in hrefs:
         r = s.get(href)
-        content = BeautifulSoup(r.content, "html.parser")
+        content = bs4.BeautifulSoup(r.content, "html.parser")
 
         d = dict()
-        if (content.select_one(name_element_filter) is not None):
+        if content.select_one(name_element_filter) is not None:
             d["name"] = content.select_one(name_element_filter).text
         else:
             d["name"] = "null"
 
-        if (content.select_one(email_element_filter) is not None):
+        if content.select_one(email_element_filter) is not None:
             d["email"] = content.select_one(email_element_filter).text
         else:
             d["email"] = "null"
 
-        if (content.select_one(phone_element_filter) is not None):
+        if content.select_one(phone_element_filter) is not None:
             d["phone"] = content.select_one(phone_element_filter).text
         else:
             d["phone"] = "null"
@@ -124,7 +128,7 @@ def get_hrefs(pages):
     for page in pages:
         r = s.get(page)
 
-        content = BeautifulSoup(r.content, "html.parser")
+        content = bs4.BeautifulSoup(r.content, "html.parser")
         rows = content.select(parent_element_filter)
 
         for row in rows:
@@ -136,12 +140,11 @@ def get_hrefs(pages):
 def get_num_pages():
     r = s.get(url)
 
-    content = BeautifulSoup(r.content, "html.parser")
+    content = bs4.BeautifulSoup(r.content, "html.parser")
 
     page_nums = content.select(page_number_element_filter)
 
-    pages = []
-    pages.append(url)
+    pages = [url]
     for page_num in page_nums[1:]:
         pages.append(page_num.select_one("a")["href"])
 
@@ -152,5 +155,5 @@ if __name__ == "__main__":
     try:
         threading.Thread(target=execute).start()
     except Exception as e:
-        print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
+        print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
               "]", str(e), "\n")
