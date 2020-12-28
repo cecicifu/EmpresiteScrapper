@@ -1,16 +1,13 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import requests
-import signal
-import threading
-import sys
+import requests, signal, threading, sys
 from time import sleep
 from bs4 import BeautifulSoup
 
 # GLOBAL VARS
 url = "https://empresite.eleconomista.es/Actividad/"
-location = None
+search = None
 timeout = 2
 
 parent_element_filter = "li.resultado_pagina"
@@ -48,11 +45,11 @@ class bcolors:
 
 if len(sys.argv) is not 2:
     print("\n" + bcolors.OKGREEN + "[" + bcolors.ENDC + bcolors.OKBLUE + "*" + bcolors.OKGREEN +
-          "] Usage:" + bcolors.ENDC + " py " + sys.argv[0] + " <location>")
+          "] Usage:" + bcolors.ENDC + " py " + sys.argv[0] + " <search>")
     sys.exit(0)
 else:
-    location = sys.argv[1].upper()
-    url = url + location + "/"
+    search = sys.argv[1].upper()
+    url = url + search + "/"
 
 
 def signal_handler(key, frame):

@@ -14,15 +14,15 @@ class Scrapping
 {
 	private Goutte $client;
 
-	private string $city;
+	private string $search;
 	private string $url;
 	private int $timeout;
 	private bool $pagination;
 
-	public function __construct(String $city, bool $pagination, int $timeout = 3)
+	public function __construct(String $search, bool $pagination, int $timeout = 3)
 	{
-		$this->city = strtoupper($city);
-		$this->url = 'https://empresite.eleconomista.es/Actividad/' . $this->city . '/';
+		$this->search = strtoupper($search);
+		$this->url = 'https://empresite.eleconomista.es/Actividad/' . $this->search . '/';
 		$this->timeout = $timeout;
 		$this->pagination = $pagination;
 
