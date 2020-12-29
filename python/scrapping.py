@@ -90,9 +90,6 @@ def execute():
     except requests.exceptions.TooManyRedirects:
         print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
               "] Too many redirects exception\n")
-    except Exception as err:
-        print("\n" + Colors.OKGREEN + "[" + Colors.ENDC + Colors.OKBLUE + "*" + Colors.OKGREEN +
-              "]", str(err), "\n")
 
 
 def get_filtered_data(hrefs):
